@@ -8,6 +8,7 @@ public class RegistarProduto_UI {
     private Federacao federacao;
 
     public RegistarProduto_UI(Federacao federacao) {
+
         this.federacao = federacao;
     }
 
