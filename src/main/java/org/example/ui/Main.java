@@ -17,7 +17,7 @@ public class Main {
 
             guardarDados(fap);
         } catch (Exception e) {
-            System.err.println("Erro no sistema: " + e.getMessage());
+            System.err.println("Erro no Sistema: " + e.getMessage());
         }
     }
 
