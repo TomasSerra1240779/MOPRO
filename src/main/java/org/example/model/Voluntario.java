@@ -19,13 +19,9 @@ public abstract class Voluntario extends Pessoa implements Serializable {
         return instituicao;
     }
 
-    public Federacao getFederacao() {
-        return federacao;
-    }
 
-    public void setFederacao(Federacao federacao) {
-        this.federacao = federacao;
-    }
+
+
 
     /**
      * Verifica se a senha fornecida é válida.
