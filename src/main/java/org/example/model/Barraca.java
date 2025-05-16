@@ -42,7 +42,7 @@ public class Barraca implements Classificacao, Serializable {
      */
     public boolean adicionarEstoque(Produto produto, int quantidade) {
         if (produto == null || quantidade <= 0) return false;
-        estoque.merge(produto, quantidade, Integer::sum);
+        estoque.merge(produto, Integer.valueOf(quantidade), (oldValue, newValue) -> oldValue != null ? (Integer) (oldValue + newValue) : newValue);
         return true;
     }
 
@@ -60,7 +60,7 @@ public class Barraca implements Classificacao, Serializable {
         if (novoEstoque == 0) {
             estoque.remove(produto);
         } else {
-            estoque.put(produto, novoEstoque);
+            estoque.put(produto, Integer.valueOf(novoEstoque));
         }
         return true;
     }

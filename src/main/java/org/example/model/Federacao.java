@@ -5,12 +5,14 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.text.DecimalFormat;
 
 /**
  * Classe que representa a federação que gerencia barracas, produtos e voluntários.
  */
 public class Federacao implements Serializable {
     private String nome;
+    private Federacao federacao;
     private final List<Produto> produtos;
     private final List<Barraca> barracas;
     private final List<Voluntario> voluntarios;
@@ -27,6 +29,7 @@ public class Federacao implements Serializable {
         this.barracas = new ArrayList<>();
         this.voluntarios = new ArrayList<>();
     }
+
 
     /**
      * Adiciona um produto à federação.
@@ -80,15 +83,16 @@ public class Federacao implements Serializable {
         StringBuilder result = new StringBuilder();
         List<Barraca> sortedList = new ArrayList<>(barracas);
         sortedList.sort((b1, b2) -> Double.compare(b2.calcularVendasDiarias(data), b1.calcularVendasDiarias(data)));
-
         result.append("Barracas ordenadas por vendas em ").append(data.toAnoMesDiaString()).append(":\n");
+
         for (String categoria : new String[]{"Ouro", "Prata", "Bronze"}) {
             result.append("\nCategoria ").append(categoria).append(":\n");
             boolean hasBarracas = false;
+
+            DecimalFormat df = new DecimalFormat("#.##");
             for (Barraca b : sortedList) {
                 if (b.classificar(data).equals(categoria)) {
-                    result.append("\t- ").append(b.getNome()).append(": €")
-                            .append(String.format("%.2f", b.calcularVendasDiarias(data))).append("\n");
+                    result.append("\t- ").append(b.getNome()).append(": €").append(df.format(b.calcularVendasDiarias(data))).append("\n");
                     hasBarracas = true;
                 }
             }

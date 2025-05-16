@@ -68,6 +68,6 @@ public class Venda implements Serializable {
      */
     @Override
     public String toString() {
-        return "Venda: " + produto.getNome() + " x" + quantidade + " (€" + String.format("%.2f", valorTotal) + ") em " + data.toAnoMesDiaString();
+        return "Venda: " + produto.getNome() + " x" + quantidade + " (€" + String.format("%.2f" + valorTotal) + ") em " + data.toAnoMesDiaString();
     }
 }

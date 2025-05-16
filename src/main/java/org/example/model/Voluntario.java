@@ -7,6 +7,7 @@ import java.io.Serializable;
  */
 public abstract class Voluntario extends Pessoa implements Serializable {
     private String instituicao;
+    private Federacao federacao;
 
     /**
      * Construtor da classe Voluntario.
@@ -45,5 +46,13 @@ public abstract class Voluntario extends Pessoa implements Serializable {
     @Override
     public String toString() {
         return super.toString() + " - " + instituicao;
+    }
+
+    public Federacao getFederacao() {
+        return federacao;
+    }
+
+    public void setFederacao(Federacao federacao) {
+        this.federacao = federacao;
     }
 }

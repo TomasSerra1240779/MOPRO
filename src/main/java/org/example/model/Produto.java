@@ -40,7 +40,7 @@ public class Produto implements Serializable {
      */
     @Override
     public String toString() {
-        return nome + " - €" + String.format("%.2f", preco);
+        return nome + " - €" + String.valueOf(preco);
     }
 
     /**
