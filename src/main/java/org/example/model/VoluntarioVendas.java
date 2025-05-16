@@ -3,57 +3,56 @@ package org.example.model;
 import org.example.utils.Data;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Classe que representa um voluntário responsável por vendas.
  */
 public class VoluntarioVendas extends Voluntario implements Classificacao, Serializable {
-    private List<Venda> vendasRealizadas;
+    private ArrayList<Venda> vendas;
 
     /**
      * Construtor da classe VoluntarioVendas.
      * @param nome Nome do voluntário.
-     * @param numeroAluno Número de aluno.
+     * @param numeroAluno Número de aluno do voluntário.
      * @param curso Curso do voluntário.
      * @param senha Senha do voluntário.
      * @param instituicao Instituição do voluntário.
-     * @throws IllegalArgumentException Se algum parâmetro for nulo.
      */
     public VoluntarioVendas(String nome, String numeroAluno, String curso, String senha, String instituicao) {
         super(nome, numeroAluno, curso, senha, instituicao);
-        this.vendasRealizadas = new ArrayList<>();
+        this.vendas = new ArrayList<>();
     }
 
     /**
-     * Registra uma venda realizada pelo voluntário.
-     * @param venda Venda a registrar.
-     * @return true se a venda foi registrada, false caso contrário.
+     * Adiciona uma venda à lista de vendas do voluntário.
+     * @param venda Venda a ser adicionada (não pode ser nula).
+     * @return true se a venda foi adicionada com sucesso.
+     * @throws IllegalArgumentException Se a venda for nula.
+     * @note Se o voluntário não realizar vendas, a lista permanecerá vazia, resultando em classificação "Bronze".
      */
-    public boolean registrarVenda(Venda venda) {
-        if (venda == null) return false;
-        return vendasRealizadas.add(venda);
+    public boolean adicionarVenda(Venda venda) {
+        if (venda == null) {
+            throw new IllegalArgumentException("Venda não pode ser nula");
+        }
+        return vendas.add(venda);
     }
 
     /**
-     * Classifica o voluntário com base nas vendas diárias.
+     * Classifica o voluntário com base no total de vendas em uma data.
      * @param data Data para a classificação.
-     * @return Categoria (Ouro, Prata, Bronze).
+     * @return "Ouro" (>1000€), "Prata" (500-1000€), ou "Bronze" (<500€).
+     * @note Se não houver vendas para a data, retorna "Bronze" (total = 0€).
      */
     @Override
     public String classificar(Data data) {
-        double totalVendas = vendasRealizadas.stream()
-                .filter(v -> v.getData().equals(data))
-                .mapToDouble(Venda::getValorTotal)
-                .sum();
-        if (totalVendas > 1000) return "Ouro";
-        else if (totalVendas >= 500) return "Prata";
-        else return "Bronze";
+        double total = 0;
+        for (Venda v : vendas) {
+            if (v.getData().equals(data)) {
+                total += v.getValorTotal();
+            }
+        }
+        if (total > 1000) return "Ouro";
+        if (total >= 500) return "Prata";
+        return "Bronze";
     }
-
-    /**
-     * Obtém a lista de vendas realizadas.
-     * @return Lista de vendas.
-     */
-    public List<Venda> getVendasRealizadas() { return vendasRealizadas; }
 }
