@@ -68,6 +68,7 @@ public abstract class Pessoa implements Serializable {
      */
     @Override
     public String toString() {
+
         return nome + " (" + numeroAluno + ") - " + curso;
     }
 }
