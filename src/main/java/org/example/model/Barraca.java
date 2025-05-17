@@ -3,9 +3,7 @@ package org.example.model;
 import org.example.utils.Data;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Classe que representa uma barraca no sistema.
@@ -13,9 +11,34 @@ import java.util.Map;
 public class Barraca implements Classificacao, Serializable {
     private String nome;
     private String instituicao;
-    private Map<Produto, Integer> estoque;
+    private List<ItemEstoque> estoque; // Substitui Map por uma lista de ItemEstoque
     private List<Venda> vendas;
     private List<Escala> escalas;
+
+    /**
+     * Classe auxiliar para armazenar um produto e sua quantidade no estoque.
+     */
+    private static class ItemEstoque {
+        private Produto produto;
+        private int quantidade;
+
+        public ItemEstoque(Produto produto, int quantidade) {
+            this.produto = produto;
+            this.quantidade = quantidade;
+        }
+
+        public Produto getProduto() {
+            return produto;
+        }
+
+        public int getQuantidade() {
+            return quantidade;
+        }
+
+        public void setQuantidade(int quantidade) {
+            this.quantidade = quantidade;
+        }
+    }
 
     /**
      * Construtor da classe Barraca.
@@ -29,7 +52,7 @@ public class Barraca implements Classificacao, Serializable {
         }
         this.nome = nome;
         this.instituicao = instituicao;
-        this.estoque = new HashMap<>();
+        this.estoque = new ArrayList<>();
         this.vendas = new ArrayList<>();
         this.escalas = new ArrayList<>();
     }
@@ -41,8 +64,19 @@ public class Barraca implements Classificacao, Serializable {
      * @return true se o estoque foi adicionado, false caso contrário.
      */
     public boolean adicionarEstoque(Produto produto, int quantidade) {
-        if (produto == null || quantidade <= 0) return false;
-        estoque.merge(produto, Integer.valueOf(quantidade), (oldValue, newValue) -> oldValue != null ? (Integer) (oldValue + newValue) : newValue);
+        if (produto == null || quantidade <= 0) {
+            return false;
+        }
+        // Procura o produto na lista de estoque
+        for (ItemEstoque item : estoque) {
+            if (item.getProduto().equals(produto)) {
+                // Se o produto já existe, incrementa a quantidade
+                item.setQuantidade(item.getQuantidade() + quantidade);
+                return true;
+            }
+        }
+        // Se o produto não existe, adiciona um novo item ao estoque
+        estoque.add(new ItemEstoque(produto, quantidade));
         return true;
     }
 
@@ -53,16 +87,30 @@ public class Barraca implements Classificacao, Serializable {
      * @return true se o estoque foi removido, false caso contrário.
      */
     public boolean removerEstoque(Produto produto, int quantidade) {
-        if (produto == null || !estoque.containsKey(produto) || estoque.get(produto) < quantidade || quantidade <= 0) {
+        if (produto == null || quantidade <= 0) {
             return false;
         }
-        int novoEstoque = estoque.get(produto) - quantidade;
-        if (novoEstoque == 0) {
-            estoque.remove(produto);
-        } else {
-            estoque.put(produto, Integer.valueOf(novoEstoque));
+        // Procura o produto na lista de estoque
+        for (ItemEstoque item : estoque) {
+            if (item.getProduto().equals(produto)) {
+                // Verifica se há quantidade suficiente
+                if (item.getQuantidade() < quantidade) {
+                    return false;
+                }
+                // Atualiza a quantidade
+                int novaQuantidade = item.getQuantidade() - quantidade;
+                if (novaQuantidade == 0) {
+                    // Remove o item se a quantidade for zero
+                    estoque.remove(item);
+                } else {
+                    // Atualiza a quantidade do item
+                    item.setQuantidade(novaQuantidade);
+                }
+                return true;
+            }
         }
-        return true;
+        // Produto não encontrado no estoque
+        return false;
     }
 
     /**
@@ -83,10 +131,13 @@ public class Barraca implements Classificacao, Serializable {
      * @return Total das vendas.
      */
     public double calcularVendasDiarias(Data data) {
-        return vendas.stream()
-                .filter(v -> v.getData().equals(data))
-                .mapToDouble(Venda::getValorTotal)
-                .sum();
+        double total = 0.0;
+        for (Venda venda : vendas) {
+            if (venda.getData().equals(data)) {
+                total += venda.getValorTotal();
+            }
+        }
+        return total;
     }
 
     /**
@@ -94,7 +145,11 @@ public class Barraca implements Classificacao, Serializable {
      * @return Quantidade total de itens em estoque.
      */
     public int getEstoqueTotal() {
-        return estoque.values().stream().mapToInt(Integer::intValue).sum();
+        int total = 0;
+        for (ItemEstoque item : estoque) {
+            total += item.getQuantidade();
+        }
+        return total;
     }
 
     /**
@@ -105,34 +160,46 @@ public class Barraca implements Classificacao, Serializable {
     @Override
     public String classificar(Data data) {
         int totalEstoque = getEstoqueTotal();
-        if (totalEstoque < 50) return "Ouro";
-        else if (totalEstoque <= 100) return "Prata";
-        else return "Bronze";
+        if (totalEstoque < 50) {
+            return "Ouro";
+        } else if (totalEstoque <= 100) {
+            return "Prata";
+        } else {
+            return "Bronze";
+        }
     }
 
     /**
      * Obtém o nome da barraca.
      * @return Nome da barraca.
      */
-    public String getNome() { return nome; }
+    public String getNome() {
+        return nome;
+    }
 
     /**
      * Obtém a instituição da barraca.
      * @return Instituição da barraca.
      */
-    public String getInstituicao() { return instituicao; }
+    public String getInstituicao() {
+        return instituicao;
+    }
 
     /**
      * Obtém a lista de escalas.
      * @return Lista de escalas.
      */
-    public List<Escala> getEscalas() { return escalas; }
+    public List<Escala> getEscalas() {
+        return escalas;
+    }
 
     /**
      * Obtém o estoque da barraca.
-     * @return Mapa de produtos e quantidades.
+     * @return Lista de itens de estoque.
      */
-    public Map<Produto, Integer> getEstoque() { return estoque; }
+    public List<ItemEstoque> getEstoque() {
+        return estoque;
+    }
 
     /**
      * Representação textual da barraca.
@@ -144,8 +211,8 @@ public class Barraca implements Classificacao, Serializable {
         if (estoque.isEmpty()) {
             result.append(" (VAZIO)\n");
         } else {
-            for (Map.Entry<Produto, Integer> entry : estoque.entrySet()) {
-                result.append("\t- ").append(entry.getKey()).append(": ").append(entry.getValue()).append(" unidades\n");
+            for (ItemEstoque item : estoque) {
+                result.append("\t- ").append(item.getProduto()).append(": ").append(item.getQuantidade()).append(" unidades\n");
             }
         }
         return result.toString();
