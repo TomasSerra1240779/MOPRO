@@ -38,6 +38,32 @@ public class VoluntarioVendas extends Voluntario implements Classificacao, Seria
     }
 
     /**
+     * Registra uma venda, adicionando-a à lista do voluntário.
+     * @param venda Venda a ser registrada.
+     * @return true se a venda foi registrada, false caso contrário.
+     */
+    public boolean registrarVenda(Venda venda) {
+        return adicionarVenda(venda);
+    }
+
+
+    /**
+     * Obtém a barraca atual do voluntário com base na data atual e escalas.
+     * @return A barraca onde o voluntário está escalado na data atual, ou null se não estiver escalado.
+     */
+    public Barraca getBarracaAtual() {
+        Data hoje = new Data(); // Data atual
+        for (Barraca barraca : getFederacao().getBarracas()) {
+            for (Escala escala : barraca.getEscalas()) {
+                if (escala.getData().equals(hoje) && escala.getVoluntarios().contains(this)) {
+                    return barraca;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * Classifica o voluntário com base no total de vendas em uma data.
      * @param data Data para a classificação.
      * @return "Ouro" (>1000€), "Prata" (500-1000€), ou "Bronze" (<500€).

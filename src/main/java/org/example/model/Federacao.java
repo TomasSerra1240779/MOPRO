@@ -79,28 +79,15 @@ public class Federacao implements Serializable {
      * @param data Data para a classificação.
      * @return String com a listagem.
      */
-    public String listarBarracasPorVendas(Data data) {
-        StringBuilder result = new StringBuilder();
+    /**
+     * Lista barracas ordenadas por vendas (decrescente).
+     * @param data Data para a classificação.
+     * @return Lista de barracas ordenada.
+     */
+    public List<Barraca> listarBarracasPorVendas(Data data) {
         List<Barraca> sortedList = new ArrayList<>(barracas);
         sortedList.sort((b1, b2) -> Double.compare(b2.calcularVendasDiarias(data), b1.calcularVendasDiarias(data)));
-        result.append("Barracas ordenadas por vendas em ").append(data.toAnoMesDiaString()).append(":\n");
-
-        for (String categoria : new String[]{"Ouro", "Prata", "Bronze"}) {
-            result.append("\nCategoria ").append(categoria).append(":\n");
-            boolean hasBarracas = false;
-
-            DecimalFormat df = new DecimalFormat("#.##");
-            for (Barraca b : sortedList) {
-                if (b.classificar(data).equals(categoria)) {
-                    result.append("\t- ").append(b.getNome()).append(": €").append(df.format(b.calcularVendasDiarias(data))).append("\n");
-                    hasBarracas = true;
-                }
-            }
-            if (!hasBarracas) {
-                result.append("\t(NENHUMA)\n");
-            }
-        }
-        return result.toString();
+        return sortedList;
     }
 
     /**
@@ -144,7 +131,7 @@ public class Federacao implements Serializable {
         adicionarProduto(new Produto("Hamburger", 5.0));
 
         // Barracas
-        Barraca b1 = new Barraca("Barraca UPorto", "Universidade do Porto");
+        Barraca b1 = new Barraca("Barraca FEUP", "FEUP");
         Barraca b2 = new Barraca("Barraca ISEP", "ISEP");
         adicionarBarraca(b1);
         adicionarBarraca(b2);
@@ -155,8 +142,8 @@ public class Federacao implements Serializable {
         b2.adicionarEstoque(produtos.get(0), 80);
 
         // Voluntários
-        Voluntario v1 = new VoluntarioVendas("João Silva", "2023001", "Eng. Sistemas", "123", "Universidade do Porto");
-        Voluntario v2 = new VoluntarioStock("Maria Santos", "2023002", "Eng. Informática", "123", "Universidade do Porto");
+        Voluntario v1 = new VoluntarioVendas("João Silva", "2023001", "Eng. Sistemas", "123", "ISEP");
+        Voluntario v2 = new VoluntarioStock("Maria Santos", "2023002", "Eng. Informática", "123", "FEUP");
         Voluntario v3 = new VoluntarioVendas("Pedro Costa", "2023003", "Eng. Mecânica", "123", "ISEP");
         adicionarVoluntario(v1);
         adicionarVoluntario(v2);
