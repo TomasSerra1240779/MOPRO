@@ -6,17 +6,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Classe que representa uma barraca no sistema.
+ * Classe que representa uma barraca
  */
 public class Barraca implements Classificacao, Serializable {
     private String nome;
     private String instituicao;
-    private List<ItemEstoque> estoque; // Substitui Map por uma lista de ItemEstoque
+    private List<ItemEstoque> estoque;
     private List<Venda> vendas;
     private List<Escala> escalas;
 
     /**
-     * Classe auxiliar para armazenar um produto e sua quantidade no estoque.
+     * Classe  para armazenar um produto e sua quantidade no estoque.
      */
     private static class ItemEstoque {
         private Produto produto;
@@ -27,17 +27,9 @@ public class Barraca implements Classificacao, Serializable {
             this.quantidade = quantidade;
         }
 
-        public Produto getProduto() {
-            return produto;
-        }
-
-        public int getQuantidade() {
-            return quantidade;
-        }
-
-        public void setQuantidade(int quantidade) {
-            this.quantidade = quantidade;
-        }
+        public Produto getProduto() { return produto; }
+        public int getQuantidade() { return quantidade; }
+        public void setQuantidade(int quantidade) { this.quantidade = quantidade; }
     }
 
     /**
@@ -67,15 +59,12 @@ public class Barraca implements Classificacao, Serializable {
         if (produto == null || quantidade <= 0) {
             return false;
         }
-        // Procura o produto na lista de estoque
         for (ItemEstoque item : estoque) {
             if (item.getProduto().equals(produto)) {
-                // Se o produto já existe, incrementa a quantidade
                 item.setQuantidade(item.getQuantidade() + quantidade);
                 return true;
             }
         }
-        // Se o produto não existe, adiciona um novo item ao estoque
         estoque.add(new ItemEstoque(produto, quantidade));
         return true;
     }
@@ -90,26 +79,20 @@ public class Barraca implements Classificacao, Serializable {
         if (produto == null || quantidade <= 0) {
             return false;
         }
-        // Procura o produto na lista de estoque
         for (ItemEstoque item : estoque) {
             if (item.getProduto().equals(produto)) {
-                // Verifica se há quantidade suficiente
                 if (item.getQuantidade() < quantidade) {
                     return false;
                 }
-                // Atualiza a quantidade
                 int novaQuantidade = item.getQuantidade() - quantidade;
                 if (novaQuantidade == 0) {
-                    // Remove o item se a quantidade for zero
                     estoque.remove(item);
                 } else {
-                    // Atualiza a quantidade do item
                     item.setQuantidade(novaQuantidade);
                 }
                 return true;
             }
         }
-        // Produto não encontrado no estoque
         return false;
     }
 
@@ -153,20 +136,72 @@ public class Barraca implements Classificacao, Serializable {
     }
 
     /**
-     * Classifica a barraca com base no estoque.
+     * Calcula o estoque final diário, considerando vendas realizadas na data.
+     * @param data A data para o cálculo.
+     * @return A soma das quantidades de todos os produtos no estoque após deduzir vendas do dia.
+     */
+    private int calcularEstoqueFinalDiario(Data data) {
+        int total = getEstoqueTotal();
+        for (Venda venda : vendas) {
+            if (venda.getData().equals(data)) {
+                total -= venda.getQuantidade();
+            }
+        }
+        return Math.max(total, 0); // Evita quantidades negativas
+    }
+
+    /**
+     * Classifica a barraca com base no estoque final diário.
      * @param data Data para a classificação.
-     * @return Categoria (Ouro, Prata, Bronze).
+     * @return "Ouro" (estoque <50), "Prata" (estoque 50-100), ou "Bronze" (estoque >100).
      */
     @Override
     public String classificar(Data data) {
-        int totalEstoque = getEstoqueTotal();
-        if (totalEstoque < 50) {
-            return "Ouro";
-        } else if (totalEstoque <= 100) {
-            return "Prata";
-        } else {
-            return "Bronze";
+        int estoqueFinal = calcularEstoqueFinalDiario(data);
+        if (estoqueFinal < 50) return "Ouro";
+        if (estoqueFinal <= 100) return "Prata";
+        return "Bronze";
+    }
+
+    /**
+     * Obtém os produtos disponíveis no estoque.
+     * @return Lista de produtos no estoque.
+     */
+    public List<Produto> getProdutos() {
+        List<Produto> produtos = new ArrayList<>();
+        for (ItemEstoque item : estoque) {
+            produtos.add(item.getProduto());
         }
+        return produtos;
+    }
+
+    /**
+     * Obtém a quantidade em estoque de um produto.
+     * @param produto Produto a verificar.
+     * @return Quantidade em estoque, ou 0 se não estiver no estoque.
+     */
+    public int getQuantidadeStock(Produto produto) {
+        for (ItemEstoque item : estoque) {
+            if (item.getProduto().equals(produto)) {
+                return item.getQuantidade();
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Atualiza o estoque de um produto.
+     * @param produto Produto a atualizar.
+     * @param quantidade Quantidade a adicionar (positiva) ou remover (negativa).
+     * @return true se a atualização foi bem-sucedida, false caso contrário.
+     */
+    public boolean atualizarStock(Produto produto, int quantidade) {
+        if (quantidade > 0) {
+            return adicionarEstoque(produto, quantidade);
+        } else if (quantidade < 0) {
+            return removerEstoque(produto, -quantidade);
+        }
+        return true;
     }
 
     /**
@@ -174,32 +209,28 @@ public class Barraca implements Classificacao, Serializable {
      * @return Nome da barraca.
      */
     public String getNome() {
-        return nome;
-    }
+        return nome; }
 
     /**
      * Obtém a instituição da barraca.
      * @return Instituição da barraca.
      */
     public String getInstituicao() {
-        return instituicao;
-    }
+        return instituicao; }
 
     /**
      * Obtém a lista de escalas.
      * @return Lista de escalas.
      */
     public List<Escala> getEscalas() {
-        return escalas;
-    }
+        return escalas; }
 
     /**
-     * Obtém o estoque da barraca.
+     * Obtém a lista de itens de estoque.
      * @return Lista de itens de estoque.
      */
     public List<ItemEstoque> getEstoque() {
-        return estoque;
-    }
+        return estoque; }
 
     /**
      * Representação textual da barraca.
