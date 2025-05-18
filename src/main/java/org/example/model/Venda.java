@@ -1,16 +1,14 @@
 package org.example.model;
 
 import org.example.utils.Data;
-import java.io.Serializable;
 
 /**
- * Classe que representa uma venda realizada.
+ * Classe que representa uma venda.
  */
-public class Venda implements Serializable {
+public class Venda {
     private Data data;
     private Produto produto;
     private int quantidade;
-    private double valorTotal;
     private VoluntarioVendas voluntario;
     private Barraca barraca;
 
@@ -20,22 +18,18 @@ public class Venda implements Serializable {
      * @param produto Produto vendido.
      * @param quantidade Quantidade vendida.
      * @param voluntario Voluntário que realizou a venda.
-     * @param barraca Barraca onde a venda ocorreu.
+     * @param barraca Barraca onde a venda foi realizada.
      * @throws IllegalArgumentException Se algum parâmetro for inválido.
      */
     public Venda(Data data, Produto produto, int quantidade, VoluntarioVendas voluntario, Barraca barraca) {
-        if (data == null || produto == null || voluntario == null || barraca == null) {
-            throw new IllegalArgumentException("Parâmetros não podem ser nulos");
-        }
-        if (quantidade <= 0) {
-            throw new IllegalArgumentException("Quantidade deve ser maior que zero");
+        if (data == null || produto == null || quantidade <= 0 || voluntario == null || barraca == null) {
+            throw new IllegalArgumentException("Parâmetros inválidos para Venda");
         }
         this.data = data;
         this.produto = produto;
         this.quantidade = quantidade;
         this.voluntario = voluntario;
         this.barraca = barraca;
-        this.valorTotal = produto.getPreco() * quantidade;
     }
 
     /**
@@ -57,10 +51,12 @@ public class Venda implements Serializable {
     public int getQuantidade() { return quantidade; }
 
     /**
-     * Obtém o valor total da venda.
-     * @return Valor total da venda.
+     * Calcula o valor total da venda.
+     * @return Valor total (preço do produto × quantidade).
      */
-    public double getValorTotal() { return valorTotal; }
+    public double getValorTotal() {
+        return produto.getPreco() * quantidade;
+    }
 
     /**
      * Representação textual da venda.
@@ -68,6 +64,7 @@ public class Venda implements Serializable {
      */
     @Override
     public String toString() {
-        return "Venda: " + produto.getNome() + " x" + quantidade + " (€" + String.format("%.2f" + valorTotal) + ") em " + data.toAnoMesDiaString();
+        return "Venda em " + data.toAnoMesDiaString() + ": " + produto.getNome() + " x" + quantidade +
+                " = €" + String.format("%.2f", getValorTotal()) + " por " + voluntario.getNome();
     }
 }

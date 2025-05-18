@@ -1,14 +1,13 @@
 package org.example.model;
 
 import org.example.utils.Data;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Classe que representa uma barraca
+ * Classe que representa uma barraca.
  */
-public class Barraca implements Classificacao, Serializable {
+public class Barraca implements Classificacao {
     private String nome;
     private String instituicao;
     private List<ItemEstoque> estoque;
@@ -16,7 +15,7 @@ public class Barraca implements Classificacao, Serializable {
     private List<Escala> escalas;
 
     /**
-     * Classe  para armazenar um produto e sua quantidade no estoque.
+     * Classe interna para armazenar um produto e sua quantidade no estoque.
      */
     private static class ItemEstoque {
         private Produto produto;
@@ -147,7 +146,7 @@ public class Barraca implements Classificacao, Serializable {
                 total -= venda.getQuantidade();
             }
         }
-        return Math.max(total, 0); // Evita quantidades negativas
+        return Math.max(total, 0);
     }
 
     /**
@@ -190,47 +189,28 @@ public class Barraca implements Classificacao, Serializable {
     }
 
     /**
-     * Atualiza o estoque de um produto.
-     * @param produto Produto a atualizar.
-     * @param quantidade Quantidade a adicionar (positiva) ou remover (negativa).
-     * @return true se a atualização foi bem-sucedida, false caso contrário.
-     */
-    public boolean atualizarStock(Produto produto, int quantidade) {
-        if (quantidade > 0) {
-            return adicionarEstoque(produto, quantidade);
-        } else if (quantidade < 0) {
-            return removerEstoque(produto, -quantidade);
-        }
-        return true;
-    }
-
-    /**
      * Obtém o nome da barraca.
      * @return Nome da barraca.
      */
-    public String getNome() {
-        return nome; }
+    public String getNome() { return nome; }
 
     /**
      * Obtém a instituição da barraca.
      * @return Instituição da barraca.
      */
-    public String getInstituicao() {
-        return instituicao; }
+    public String getInstituicao() { return instituicao; }
 
     /**
      * Obtém a lista de escalas.
      * @return Lista de escalas.
      */
-    public List<Escala> getEscalas() {
-        return escalas; }
+    public List<Escala> getEscalas() { return escalas; }
 
     /**
-     * Obtém a lista de itens de estoque.
-     * @return Lista de itens de estoque.
+     * Obtém a lista de vendas.
+     * @return Lista de vendas.
      */
-    public List<ItemEstoque> getEstoque() {
-        return estoque; }
+    public List<Venda> getVendas() { return vendas; }
 
     /**
      * Representação textual da barraca.

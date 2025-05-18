@@ -62,7 +62,7 @@ public class FazerVendaUI {
             return;
         }
 
-        Data data = new Data(); // Data atual
+        Data data = new Data();
         Venda venda = new Venda(data, produto, quantidade, voluntario, barraca);
         if (barraca.registrarVenda(venda) && voluntario.registrarVenda(venda)) {
             System.out.println("Venda registrada com sucesso!");

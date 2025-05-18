@@ -1,21 +1,18 @@
 package org.example.model;
 
 import org.example.utils.Data;
-import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.text.DecimalFormat;
 
 /**
  * Classe que representa a federação que gerencia barracas, produtos e voluntários.
  */
-public class Federacao implements Serializable {
+public class Federacao {
     private String nome;
-    private Federacao federacao;
-    private final List<Produto> produtos;
-    private final List<Barraca> barracas;
-    private final List<Voluntario> voluntarios;
+    private List<Produto> produtos;
+    private List<Barraca> barracas;
+    private List<Pessoa> pessoas;
 
     /**
      * Construtor da classe Federacao.
@@ -27,9 +24,8 @@ public class Federacao implements Serializable {
         this.nome = nome;
         this.produtos = new ArrayList<>();
         this.barracas = new ArrayList<>();
-        this.voluntarios = new ArrayList<>();
+        this.pessoas = new ArrayList<>();
     }
-
 
     /**
      * Adiciona um produto à federação.
@@ -54,14 +50,16 @@ public class Federacao implements Serializable {
     }
 
     /**
-     * Adiciona um voluntário à federação.
-     * @param voluntario Voluntário a adicionar.
-     * @return true se o voluntário foi adicionado, false caso contrário.
+     * Adiciona uma pessoa (voluntário ou administrador) à federação.
+     * @param pessoa Pessoa a adicionar.
+     * @return true se a pessoa foi adicionada, false caso contrário.
      */
-    public boolean adicionarVoluntario(Voluntario voluntario) {
-        if (voluntario == null) return false;
-        voluntario.setFederacao(this);
-        return voluntarios.add(voluntario);
+    public boolean adicionarPessoa(Pessoa pessoa) {
+        if (pessoa == null) return false;
+        if (pessoa instanceof Voluntario) {
+            ((Voluntario) pessoa).setFederacao(this);
+        }
+        return pessoas.add(pessoa);
     }
 
     /**
@@ -69,57 +67,46 @@ public class Federacao implements Serializable {
      * @return Lista ordenada de voluntários.
      */
     public List<Voluntario> listarVoluntariosPorNumeroAluno() {
-        List<Voluntario> sortedList = new ArrayList<>(voluntarios);
-        sortedList.sort(Comparator.comparing(Voluntario::getNumeroAluno));
-        return sortedList;
+        List<Voluntario> voluntarios = new ArrayList<>();
+        for (Pessoa p : pessoas) {
+            if (p instanceof Voluntario) {
+                voluntarios.add((Voluntario) p);
+            }
+        }
+        voluntarios.sort(Comparator.comparing(Voluntario::getNumeroAluno));
+        return voluntarios;
     }
 
     /**
-     * Lista barracas ordenadas por vendas (decrescente) e agrupadas por categoria.
+     * Lista barracas agrupadas por classificação (Ouro, Prata, Bronze) e ordenadas por vendas (decrescente).
      * @param data Data para a classificação.
      * @return String com a listagem.
      */
-    /**
-     * Lista barracas ordenadas por vendas (decrescente).
-     * @param data Data para a classificação.
-     * @return Lista de barracas ordenada.
-     */
-    public List<Barraca> listarBarracasPorVendas(Data data) {
-        List<Barraca> sortedList = new ArrayList<>(barracas);
-        sortedList.sort((b1, b2) -> Double.compare(b2.calcularVendasDiarias(data), b1.calcularVendasDiarias(data)));
-        return sortedList;
+    public String listarBarracasPorVendas(Data data) {
+        StringBuilder result = new StringBuilder("Barracas por Vendas (" + data.toAnoMesDiaString() + "):\n");
+        List<Barraca> ouro = new ArrayList<>();
+        List<Barraca> prata = new ArrayList<>();
+        List<Barraca> bronze = new ArrayList<>();
+        for (Barraca b : barracas) {
+            String classificacao = b.classificar(data);
+            if (classificacao.equals("Ouro")) ouro.add(b);
+            else if (classificacao.equals("Prata")) prata.add(b);
+            else bronze.add(b);
+        }
+        ouro.sort((b1, b2) -> Double.compare(b2.calcularVendasDiarias(data), b1.calcularVendasDiarias(data)));
+        prata.sort((b1, b2) -> Double.compare(b2.calcularVendasDiarias(data), b1.calcularVendasDiarias(data)));
+        bronze.sort((b1, b2) -> Double.compare(b2.calcularVendasDiarias(data), b1.calcularVendasDiarias(data)));
+        result.append("\nOuro:\n").append(listarGrupo(ouro, data));
+        result.append("\nPrata:\n").append(listarGrupo(prata, data));
+        result.append("\nBronze:\n").append(listarGrupo(bronze, data));
+        return result.toString();
     }
 
-    /**
-     * Salva os dados da federação em um arquivo.
-     */
-    public void salvarDados() {
-        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream("federacao.dat"))) {
-            out.writeObject(this);
-        } catch (IOException e) {
-            System.out.println("Erro ao salvar dados: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Carrega os dados da federação de um arquivo.
-     */
-    public void carregarDados() {
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream("federacao.dat"))) {
-            Federacao loaded = (Federacao) in.readObject();
-            this.nome = loaded.nome;
-            this.produtos.clear();
-            this.produtos.addAll(loaded.produtos);
-            this.barracas.clear();
-            this.barracas.addAll(loaded.barracas);
-            this.voluntarios.clear();
-            this.voluntarios.addAll(loaded.voluntarios);
-            for (Voluntario v : this.voluntarios) {
-                v.setFederacao(this);
-            }
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Erro ao carregar dados: " + e.getMessage());
-        }
+    private String listarGrupo(List<Barraca> grupo, Data data) {
+        StringBuilder result = new StringBuilder();
+        if (grupo.isEmpty()) result.append("\t(Nenhuma barraca)\n");
+        else for (Barraca b : grupo) result.append("\t").append(b.getNome()).append(": €").append(String.format("%.2f", b.calcularVendasDiarias(data))).append("\n");
+        return result.toString();
     }
 
     /**
@@ -141,18 +128,24 @@ public class Federacao implements Serializable {
         b1.adicionarEstoque(produtos.get(1), 50);
         b2.adicionarEstoque(produtos.get(0), 80);
 
-        // Voluntários
-        Voluntario v1 = new VoluntarioVendas("João Silva", "2023001", "Eng. Sistemas", "123", "ISEP");
+        // Pessoas
+        Administrador admin = new Administrador("Admin", "0000001", "Administração", "admin123");
+        Voluntario v1 = new VoluntarioVendas("João Silva", "2023001", "Eng. Sistemas", "123", "FEUP");
         Voluntario v2 = new VoluntarioStock("Maria Santos", "2023002", "Eng. Informática", "123", "FEUP");
-        Voluntario v3 = new VoluntarioVendas("Pedro Costa", "2023003", "Eng. Mecânica", "123", "ISEP");
-        adicionarVoluntario(v1);
-        adicionarVoluntario(v2);
-        adicionarVoluntario(v3);
+        Voluntario v3 = new VoluntarioVendas("Pedro Costa", "2023003", "Eng. Mecânica", "123", "FEUP");
+        adicionarPessoa(admin);
+        adicionarPessoa(v1);
+        adicionarPessoa(v2);
+        adicionarPessoa(v3);
 
         // Escala
         Escala e1 = new Escala(new Data(2025, 5, 15), b1);
-        e1.adicionarVoluntario(v1);
-        e1.adicionarVoluntario(v2);
+        try {
+            e1.adicionarVoluntario(v1);
+            e1.adicionarVoluntario(v2);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Erro ao criar escala de teste: " + e.getMessage());
+        }
         b1.getEscalas().add(e1);
     }
 
@@ -169,9 +162,9 @@ public class Federacao implements Serializable {
         result.append("Barracas:\n");
         if (barracas.isEmpty()) result.append(" (VAZIO)\n");
         else for (Barraca b : barracas) result.append("\t- ").append(b.getNome()).append(" (").append(b.getInstituicao()).append(")\n");
-        result.append("Voluntários:\n");
-        if (voluntarios.isEmpty()) result.append(" (VAZIO)\n");
-        else for (Voluntario v : voluntarios) result.append("\t- ").append(v).append("\n");
+        result.append("Pessoas:\n");
+        if (pessoas.isEmpty()) result.append(" (VAZIO)\n");
+        else for (Pessoa p : pessoas) result.append("\t- ").append(p).append("\n");
         return result.toString();
     }
 
@@ -179,20 +172,17 @@ public class Federacao implements Serializable {
      * Obtém a lista de produtos.
      * @return Lista de produtos.
      */
-    public List<Produto> getProdutos() {
-        return produtos; }
+    public List<Produto> getProdutos() { return produtos; }
 
     /**
      * Obtém a lista de barracas.
      * @return Lista de barracas.
      */
-    public List<Barraca> getBarracas() {
-        return barracas; }
+    public List<Barraca> getBarracas() { return barracas; }
 
     /**
-     * Obtém a lista de voluntários.
-     * @return Lista de voluntários.
+     * Obtém a lista de pessoas.
+     * @return Lista de pessoas.
      */
-    public List<Voluntario> getVoluntarios() {
-        return voluntarios; }
+    public List<Pessoa> getPessoas() { return pessoas; }
 }

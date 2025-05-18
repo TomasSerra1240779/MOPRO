@@ -1,14 +1,13 @@
 package org.example.model;
 
 import org.example.utils.Data;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Classe que representa uma escala de voluntários em uma barraca.
  */
-public class Escala implements Serializable {
+public class Escala {
     private Data data;
     private Barraca barraca;
     private List<Voluntario> voluntarios;
@@ -32,16 +31,16 @@ public class Escala implements Serializable {
      * Adiciona um voluntário à escala.
      * @param voluntario Voluntário a adicionar.
      * @return true se o voluntário foi adicionado, false caso contrário.
+     * @throws IllegalArgumentException Se o voluntário já está escalado em outra barraca na mesma data.
      */
     public boolean adicionarVoluntario(Voluntario voluntario) {
         if (voluntario == null || !voluntario.getInstituicao().equals(barraca.getInstituicao())) {
             return false;
         }
-        // Verifica conflitos de escala
         for (Barraca b : voluntario.getFederacao().getBarracas()) {
             for (Escala e : b.getEscalas()) {
                 if (e.getData().equals(data) && e.getVoluntarios().contains(voluntario)) {
-                    return false;
+                    throw new IllegalArgumentException("Voluntário já escalado em outra barraca para " + data.toAnoMesDiaString());
                 }
             }
         }

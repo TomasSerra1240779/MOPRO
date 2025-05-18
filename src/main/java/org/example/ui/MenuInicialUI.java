@@ -1,9 +1,6 @@
 package org.example.ui;
 
-import org.example.model.Federacao;
-import org.example.model.Voluntario;
-import org.example.model.VoluntarioStock;
-import org.example.model.VoluntarioVendas;
+import org.example.model.*;
 import org.example.utils.Utils;
 
 import java.io.IOException;
@@ -15,7 +12,7 @@ public class MenuInicialUI {
     private Federacao federacao;
 
     /**
-     * Construtor da classe MenuInicialUI.
+     * Construtor da classe MenuInicial_UI.
      * @param federacao Instância da federação.
      */
     public MenuInicialUI(Federacao federacao) {
@@ -60,12 +57,16 @@ public class MenuInicialUI {
      * @throws IOException Se ocorrer um erro de entrada/saída.
      */
     private void autenticarAdministrador() throws IOException {
-        String username = Utils.readLineFromConsole("Username (admin): ");
+        String numero = Utils.readLineFromConsole("Número de administrador: ");
         String password = Utils.readLineFromConsole("Password: ");
-        if (username.equals("admin") && password.equals("admin123")) {
+        Pessoa pessoa = federacao.getPessoas().stream()
+                .filter(p -> p.getNumeroAluno().equals(numero) && p instanceof Administrador)
+                .findFirst()
+                .orElse(null);
+        if (pessoa != null && ((Administrador) pessoa).autenticar(password)) {
             new MenuAdministrador(federacao).run();
         } else {
-            System.out.println("Credenciais inválidas!");
+            System.out.println("Credenciais inválidas ou pessoa não é administrador!");
         }
     }
 
@@ -76,11 +77,11 @@ public class MenuInicialUI {
     private void autenticarVoluntarioStock() throws IOException {
         String numero = Utils.readLineFromConsole("Número de voluntário: ");
         String password = Utils.readLineFromConsole("Password: ");
-        Voluntario voluntario = federacao.getVoluntarios().stream()
-                .filter(v -> v.getNumeroAluno().equals(numero) && v instanceof VoluntarioStock)
+        Pessoa pessoa = federacao.getPessoas().stream()
+                .filter(p -> p.getNumeroAluno().equals(numero) && p instanceof VoluntarioStock)
                 .findFirst()
                 .orElse(null);
-        if (voluntario != null && voluntario.autenticar(password)) {
+        if (pessoa != null && ((VoluntarioStock) pessoa).autenticar(password)) {
             new MenuVoluntarioStock(federacao).run();
         } else {
             System.out.println("Credenciais inválidas ou voluntário não é do tipo Stock!");
@@ -94,12 +95,12 @@ public class MenuInicialUI {
     private void autenticarVoluntarioVendas() throws IOException {
         String numero = Utils.readLineFromConsole("Número de voluntário: ");
         String password = Utils.readLineFromConsole("Password: ");
-        Voluntario voluntario = federacao.getVoluntarios().stream()
-                .filter(v -> v.getNumeroAluno().equals(numero) && v instanceof VoluntarioVendas)
+        Pessoa pessoa = federacao.getPessoas().stream()
+                .filter(p -> p.getNumeroAluno().equals(numero) && p instanceof VoluntarioVendas)
                 .findFirst()
                 .orElse(null);
-        if (voluntario != null && voluntario.autenticar(password)) {
-            new MenuVoluntarioVendas(federacao).run();
+        if (pessoa != null && ((VoluntarioVendas) pessoa).autenticar(password)) {
+            new MenuVoluntarioVendas(federacao, (VoluntarioVendas) pessoa).run();
         } else {
             System.out.println("Credenciais inválidas ou voluntário não é do tipo Vendas!");
         }
