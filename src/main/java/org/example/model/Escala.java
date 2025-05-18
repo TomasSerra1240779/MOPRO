@@ -59,13 +59,15 @@ public class Escala {
      * Obtém a data da escala.
      * @return Data da escala.
      */
-    public Data getData() { return data; }
+    public Data getData() {
+        return data; }
 
     /**
      * Obtém a lista de voluntários.
      * @return Lista de voluntários.
      */
-    public List<Voluntario> getVoluntarios() { return voluntarios; }
+    public List<Voluntario> getVoluntarios() {
+        return voluntarios; }
 
     /**
      * Representação textual da escala.

@@ -7,6 +7,7 @@ public class Main {
         try {
             // Construção da empresa
             Federacao fap = new Federacao("Federação Académica do Porto");
+            fap.inicializarDadosTeste();
             System.out.println(fap);
 
             MenuInicialUI uiMenu = new MenuInicialUI(fap);
