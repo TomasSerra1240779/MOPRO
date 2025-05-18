@@ -1,9 +1,11 @@
 package org.example.model;
 
+import java.io.Serializable;
+
 /**
  * Classe que representa um produto.
  */
-public class Produto {
+public class Produto implements Serializable {
     private String nome;
     private double preco;
 

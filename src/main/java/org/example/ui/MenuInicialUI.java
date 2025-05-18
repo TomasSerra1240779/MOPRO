@@ -52,6 +52,31 @@ public class MenuInicialUI {
         } while (!opcao.equals("0"));
     }
 
+    private void salvarDados() {
+        try {
+            federacao.saveToFile("federacao.dat");
+            System.out.println("Dados salvos com sucesso!");
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar dados: " + e.getMessage());
+        }
+    }
+
+    private void carregarDados() {
+        try {
+            Federacao novaFederacao = Federacao.loadFromFile("federacao.dat");
+            // Copiar dados para a federação atual, mantendo referências
+            federacao.getProdutos().clear();
+            federacao.getProdutos().addAll(novaFederacao.getProdutos());
+            federacao.getBarracas().clear();
+            federacao.getBarracas().addAll(novaFederacao.getBarracas());
+            federacao.getPessoas().clear();
+            federacao.getPessoas().addAll(novaFederacao.getPessoas());
+            System.out.println("Dados carregados com sucesso!");
+        } catch (IOException | ClassNotFoundException e) {
+            System.out.println("Erro ao carregar dados: " + e.getMessage());
+        }
+    }
+
     /**
      * Autentica um administrador.
      * @throws IOException Se ocorrer um erro de entrada/saída.

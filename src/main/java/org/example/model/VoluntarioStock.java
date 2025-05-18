@@ -1,9 +1,11 @@
 package org.example.model;
 
+import java.io.Serializable;
+
 /**
  * Classe que representa um voluntário de gestão de estoque.
  */
-public class VoluntarioStock extends Voluntario {
+public class VoluntarioStock extends Voluntario implements Serializable {
     /**
      * Construtor da classe VoluntarioStock.
      * @param nome Nome do voluntário.

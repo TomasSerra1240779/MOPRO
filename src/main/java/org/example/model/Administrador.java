@@ -1,9 +1,11 @@
 package org.example.model;
 
+import java.io.Serializable;
+
 /**
  * Classe que representa um administrador no sistema.
  */
-public class Administrador extends Pessoa {
+public class Administrador extends Pessoa implements Serializable {
     /**
      * Construtor da classe Administrador.
      * @param nome Nome do administrador.

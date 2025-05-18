@@ -2,10 +2,12 @@ package org.example.model;
 
 import org.example.utils.Data;
 
+import java.io.Serializable;
+
 /**
  * Classe abstrata que representa um voluntário no sistema.
  */
-public abstract class Voluntario extends Pessoa {
+public abstract class Voluntario extends Pessoa implements Serializable {
     private String instituicao;
     private Federacao federacao;
 

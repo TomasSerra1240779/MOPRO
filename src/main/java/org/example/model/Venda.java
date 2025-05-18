@@ -2,10 +2,12 @@ package org.example.model;
 
 import org.example.utils.Data;
 
+import java.io.Serializable;
+
 /**
  * Classe que representa uma venda.
  */
-public class Venda {
+public class Venda implements Serializable {
     private Data data;
     private Produto produto;
     private int quantidade;

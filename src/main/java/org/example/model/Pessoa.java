@@ -1,9 +1,11 @@
 package org.example.model;
 
+import java.io.Serializable;
+
 /**
  * Classe abstrata que representa uma pessoa no sistema.
  */
-public abstract class Pessoa {
+public abstract class Pessoa implements Serializable {
     private String nome;
     private String numeroAluno;
     private String curso;

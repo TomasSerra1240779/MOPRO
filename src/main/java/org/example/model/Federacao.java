@@ -1,6 +1,8 @@
 package org.example.model;
 
 import org.example.utils.Data;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.List;
 /**
  * Classe que representa a federação que gerencia barracas, produtos e voluntários.
  */
-public class Federacao {
+public class Federacao implements Serializable {
     private String nome;
     private List<Produto> produtos;
     private List<Barraca> barracas;
@@ -185,4 +187,16 @@ public class Federacao {
      * @return Lista de pessoas.
      */
     public List<Pessoa> getPessoas() { return pessoas; }
+
+    public void saveToFile(String filename) throws IOException {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filename))) {
+            oos.writeObject(this);
+        }
+    }
+
+    public static Federacao loadFromFile(String filename) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filename))) {
+            return (Federacao) ois.readObject();
+        }
+    }
 }

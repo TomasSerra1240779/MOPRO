@@ -1,13 +1,15 @@
 package org.example.model;
 
 import org.example.utils.Data;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Classe que representa uma escala de voluntários em uma barraca.
  */
-public class Escala {
+public class Escala implements Serializable {
     private Data data;
     private Barraca barraca;
     private List<Voluntario> voluntarios;
